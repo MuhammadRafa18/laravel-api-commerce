@@ -4,33 +4,30 @@ use App\Http\Controllers\Api\Admin\About;
 use App\Http\Controllers\Api\Admin\Banner as AdminBanner;
 use App\Http\Controllers\Api\Admin\CategoryController as AdminCategoryController;
 use App\Http\Controllers\Api\Admin\DashboardController;
-use App\Http\Controllers\Api\User\DataUser as AdminDataUser;
 use App\Http\Controllers\Api\Admin\Faq_category;
-use App\Http\Controllers\Api\User\FavoriteController;
 use App\Http\Controllers\Api\Admin\ProductController;
-use App\Http\Controllers\Api\Admin\SkinTypes;
 use App\Http\Controllers\Api\Admin\Result as AdminResult;
 use App\Http\Controllers\Api\Admin\ShippingZone;
+use App\Http\Controllers\Api\Admin\SkinTypes;
 use App\Http\Controllers\Api\Admin\UserAdmin;
 use App\Http\Controllers\Api\Admin\ZoneRegion;
 use App\Http\Controllers\Api\Auth\AuthDataUserController;
 use App\Http\Controllers\Api\Auth\AuthUserAdmin;
 use App\Http\Controllers\Api\Auth\GoogleAuthController;
-use App\Http\Controllers\Api\User\AddresController;
-use App\Http\Controllers\Api\User\DetailFaq;
-use App\Http\Controllers\Api\User\OrderController;
 use App\Http\Controllers\Api\Auth\ResendVerificationController;
 use App\Http\Controllers\Api\Auth\VerificationController;
-use App\Http\Controllers\Api\User\PhoneVertivication;
+use App\Http\Controllers\Api\User\AddresController;
 use App\Http\Controllers\Api\User\CartController;
 use App\Http\Controllers\Api\User\ContactController;
+use App\Http\Controllers\Api\User\DataUser as AdminDataUser;
+use App\Http\Controllers\Api\User\DetailFaq;
+use App\Http\Controllers\Api\User\FavoriteController;
+use App\Http\Controllers\Api\User\OrderController;
 use App\Http\Controllers\Api\User\PaymentController;
+use App\Http\Controllers\Api\User\PhoneVertivication;
 use App\Http\Controllers\Api\User\VisitorController;
-use App\Models\Product;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Route;
-
 
 /*
 |--------------------------------------------------------------------------
@@ -64,17 +61,17 @@ Route::get(
 
 //  resen verif email
 Route::post('/email/resend', [ResendVerificationController::class, 'resend'])->middleware(['throttle:5,1']);
-// verif nomor 
+// verif nomor
 Route::get('/phone/verify/{token}', [PhoneVertivication::class, 'verify']);
 
 // webhook midtrans
-    Route::post('/midtrans/callback', [PaymentController::class, 'callback']);
+Route::post('/midtrans/callback', [PaymentController::class, 'callback']);
 
 // Register
 Route::post('register', [AdminDataUser::class, 'register']);
 // Products
 Route::apiResource('products', ProductController::class)
-    ->only(['index', 'show','showwithId']);
+    ->only(['index', 'show', 'showwithId']);
 
 // Faq Category
 Route::apiResource('faq-categories', Faq_category::class)
@@ -84,7 +81,6 @@ Route::post('/visitor', [VisitorController::class, 'store']);
 // CATEGORY
 Route::apiResource('category', AdminCategoryController::class)
     ->only('index');
-    
 
 // SKIN TYPE
 Route::apiResource('skin-types', SkinTypes::class)
@@ -93,7 +89,7 @@ Route::apiResource('skin-types', SkinTypes::class)
 Route::apiResource('banners', AdminBanner::class)
     ->only(['index', 'show']);
 
-//About
+// About
 Route::apiResource('about', About::class)
     ->only('show');
 // Detail Faq
@@ -114,7 +110,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('admin/logout', [AuthUserAdmin::class, 'logout']);
 });
 
-
 //  Hak Ases User
 Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     //  Addres
@@ -122,9 +117,8 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
 
     // Order
     Route::apiResource('orders', OrderController::class)
-        ->only(['checkout', 'show','user','destroy']);
+        ->only(['checkout', 'show', 'user', 'destroy']);
     Route::post('/orders/{order}/confirm-done', [OrderController::class, 'confirmDone']);
-
 
     //  User
     Route::get('user/profile', [AdminDataUser::class, 'show']);
@@ -141,7 +135,6 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::apiResource('cart', CartController::class)
         ->only(['index', 'store', 'destroy']);
     Route::post('cart/{cart}/selected', [CartController::class, 'select'])->middleware('throttle:20,1');
-    
 
     // Verif Phone
     Route::post('/phone/request', [PhoneVertivication::class, 'phone'])->middleware(['throttle:2,1']);
@@ -150,11 +143,10 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::post('payment/{id}', [PaymentController::class, 'create']);
 });
 
-
 // Hak ases Admin dn Super admin
 Route::middleware(['auth:sanctum', 'role:admin|super_admin'])
     ->prefix('admin')
-    ->group(function () {   
+    ->group(function () {
 
         // Category
         Route::apiResource('category', AdminCategoryController::class)
@@ -162,27 +154,23 @@ Route::middleware(['auth:sanctum', 'role:admin|super_admin'])
 
         // Order
         Route::apiResource('orders', OrderController::class)
-            ->only(['index', 'update',]);
-      
-
+            ->only(['index', 'update']);
 
         // Produk
-           Route::apiResource('products', ProductController::class)
+        Route::apiResource('products', ProductController::class)
             ->only(['store', 'update', 'destroy']);
-    
 
-        //Banner
-          Route::apiResource('banners', AdminBanner::class)
+        // Banner
+        Route::apiResource('banners', AdminBanner::class)
             ->only(['store', 'update', 'destroy']);
         // Produk Skin Type
-         Route::apiResource('skin-types', SkinTypes::class)
+        Route::apiResource('skin-types', SkinTypes::class)
             ->only(['store', 'update', 'destroy']);
-
 
         // Result
         Route::apiResource('result', AdminResult::class)
-            ->only([ 'show', 'store', 'update', 'destroy']);
-      
+            ->only(['show', 'store', 'update', 'destroy']);
+
         // About
         Route::apiResource('about', About::class)
             ->only(['index', 'store', 'update', 'destroy']);
@@ -198,35 +186,33 @@ Route::middleware(['auth:sanctum', 'role:admin|super_admin'])
         Route::apiResource('contacts', ContactController::class)
             ->only(['index', 'show', 'destroy']);
 
-        // User 
-         Route::get('me', [UserAdmin::class, 'me']);
-         Route::apiResource('users', UserAdmin::class)
+        // User
+        Route::get('me', [UserAdmin::class, 'me']);
+        Route::apiResource('users', UserAdmin::class)
             ->only(['index', 'update']);
         // User Client
         Route::apiResource('DataUser', AdminDataUser::class)
             ->only(['index']);
         //  Shipping Zone
-        Route::apiResource('shippingZone',ShippingZone::class);
+        Route::apiResource('shippingZone', ShippingZone::class);
         // Zone Region
-        Route::apiResource('zoneRegion',ZoneRegion::class);
+        Route::apiResource('zoneRegion', ZoneRegion::class);
         // visitor
         Route::get('/visitor', [DashboardController::class, 'indexVisit']);
         // cart top catgeory
         Route::get('/admin/dashboard/top-categories', [DashboardController::class, 'getTopCategories']);
         // card order
         Route::get('/admin/dashboard/orders/count', [DashboardController::class, 'countOrder']);
-         // card User
+        // card User
         Route::get('/admin/dashboard/users/count', [DashboardController::class, 'countUser']);
-         // card Transaksi
+        // card Transaksi
         Route::get('/admin/dashboard/payments/count', [DashboardController::class, 'countPayment']);
         // Card Low Stcok
         Route::get('/admin/dashboard/low-stock', [DashboardController::class, 'lowStock']);
 
     });
 
-
-
-//  Hak Ases Super Admin  
+//  Hak Ases Super Admin
 Route::middleware(['auth:sanctum', 'role:super_admin'])
     ->group(function () {
         route::apiResource('users', UserAdmin::class)

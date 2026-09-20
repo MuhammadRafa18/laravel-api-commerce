@@ -6,9 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\FaqCategoryResource;
 use App\Models\Faq_category as ModelsFaq;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Validator;
-
 
 class Faq_category extends Controller
 {
@@ -17,22 +15,20 @@ class Faq_category extends Controller
      */
     public function index()
     {
-        $cacheKey = 'faq_categories_page_' . request()->get('page', 1);
-        $Faq_category = Cache::remember($cacheKey, 3600, function () {
-            return ModelsFaq::orderBy('created_at', 'desc')->paginate(10);
-        });
+
+        $Faq_category = ModelsFaq::orderBy('created_at', 'desc')->paginate(10);
         if ($Faq_category->isEmpty()) {
             return response()->json([
                 'message' => 'Faq Category not Found',
             ], 404);
         }
+
         return FaqCategoryResource::collection($Faq_category);
     }
 
     /**
      * Show the form for creating a new resource.
      */
-
 
     /**
      * Store a newly created resource in storage.
@@ -51,9 +47,10 @@ class Faq_category extends Controller
         $Faq_category = ModelsFaq::create([
             'category' => $request->category,
         ]);
+
         return response()->json([
             'messages' => 'Faq Category berhasil ditambahkan',
-            'data' => new FaqCategoryResource($Faq_category)
+            'data' => new FaqCategoryResource($Faq_category),
         ], 201);
     }
 
@@ -63,14 +60,13 @@ class Faq_category extends Controller
     public function show(ModelsFaq $Faq_category)
     {
         return response()->json([
-            'data' => new FaqCategoryResource($Faq_category)
-        ],200);
+            'data' => new FaqCategoryResource($Faq_category),
+        ], 200);
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-
 
     /**
      * Update the specified resource in storage.
@@ -89,12 +85,12 @@ class Faq_category extends Controller
         $Faq_category->update([
             'category' => $request->category,
         ]);
+
         return response()->json([
             'messages' => 'Faq Category berhasil diupdate',
-            'data' => new FaqCategoryResource($Faq_category)
+            'data' => new FaqCategoryResource($Faq_category),
         ], 200);
     }
-
 
     /**
      * Remove the specified resource from storage.
@@ -102,6 +98,7 @@ class Faq_category extends Controller
     public function destroy(ModelsFaq $Faq_category)
     {
         $Faq_category->delete();
+
         return response()->json([
             'messages' => 'Faq Category berhasil dihapus',
         ], 200);

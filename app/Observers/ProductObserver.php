@@ -7,14 +7,23 @@ use Illuminate\Support\Facades\Cache;
 
 class ProductObserver
 {
-    public function  clearProductCache(Product $product)
+    public function clearProductCache(Product $product)
     {
+
+        // Clear cache detail berdasarkan ID
         Cache::forget("product_id_{$product->id}");
+
+        // Clear cache detail berdasarkan slug
         if ($product->slug) {
             Cache::forget("product_slug_{$product->slug}");
         }
-        Cache::forget('products_page_' . request('page', 1));
+
+        // Clear cache semua halaman product
+        for ($page = 1; $page <= 100; $page++) {
+            Cache::forget("products_page_{$page}");
+        }
     }
+
     /**
      * Handle the Product "created" event.
      */
@@ -29,6 +38,13 @@ class ProductObserver
     public function updated(Product $product): void
     {
         $this->clearProductCache($product);
+
+        // Kalau slug berubah, hapus cache slug lama juga
+        $oldSlug = $product->getOriginal('slug');
+
+        if ($oldSlug && $oldSlug !== $product->slug) {
+            Cache::forget("product_slug_{$oldSlug}");
+        }
     }
 
     /**
@@ -38,5 +54,4 @@ class ProductObserver
     {
         $this->clearProductCache($product);
     }
-
 }

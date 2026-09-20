@@ -9,14 +9,12 @@ use App\Http\Resources\ProductResource;
 use App\Models\OrderItem;
 use App\Models\Product;
 use App\Services\Product\ProductService;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
-
 
 class ProductController extends Controller
 {
-
     protected $productService;
 
     public function __construct(ProductService $productService)
@@ -42,10 +40,10 @@ class ProductController extends Controller
                 ->paginate(10);
         });
 
-
         if ($product->isEmpty()) {
             return response()->json(['messages' => 'Produk Not found'], 404);
         }
+
         return ProductResource::collection($product);
     }
 
@@ -55,19 +53,16 @@ class ProductController extends Controller
         $data = $request->validated();
         if ($request->hasFile('image_produk') && $request->hasFile('image_banner')) {
             $data['image_produk'] = $request->file('image_produk')->store('image_produks', 'public');
-            $data['image_banner'] = $request->file('image_banner')->store('image_banner', 'public');
+            $data['image_banner'] = $request->file('image_banner')->store('image_banners', 'public');
         }
-
-
 
         $product = $this->productService->store($data);
 
         return response()->json([
             'messages' => 'data berhasil ditambahkan',
-            'data' => new ProductResource($product)
+            'data' => new ProductResource($product),
         ], 201);
     }
-
 
     public function show($slug)
     {
@@ -81,14 +76,14 @@ class ProductController extends Controller
                 'product_sku.attribute:id,product_sku_id,size,color',
             ])->where('slug', $slug)->firstOrFail();
         });
+
         return response()->json([
-            'data' => new ProductResource($product)
+            'data' => new ProductResource($product),
         ], 200);
     }
 
     public function showwithId($id)
     {
-
 
         $cacheKey = "product_id_{$id}";
 
@@ -103,16 +98,13 @@ class ProductController extends Controller
         });
 
         return response()->json([
-            'data' => new ProductResource($product)
+            'data' => new ProductResource($product),
         ], 200);
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-
-
-
     public function update(UpdateProductRequest $request, Product $product)
     {
         $this->authorize('update', $product);
@@ -132,12 +124,12 @@ class ProductController extends Controller
         }
         $this->productService->update($data, $product);
         $product->refresh();
+
         return response()->json([
             'messages' => 'Produk berhasil diupdate',
-            'data' => new ProductResource($product)
+            'data' => new ProductResource($product),
         ], 200);
     }
-
 
     public function destroy($id)
     {
@@ -147,7 +139,7 @@ class ProductController extends Controller
 
         if ($usedInOrder) {
             return response()->json([
-                'message' => 'Produk tidak bisa dihapus karena sudah ada di order'
+                'message' => 'Produk tidak bisa dihapus karena sudah ada di order',
             ], 409);
         }
 
@@ -159,6 +151,7 @@ class ProductController extends Controller
         }
         $produk->skin_type()->detach($produk->skin_type_id);
         $produk->delete();
+
         return response()->json([
             'message' => 'Data berhasil di hapus',
 

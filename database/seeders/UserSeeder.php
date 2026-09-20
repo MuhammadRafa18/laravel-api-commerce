@@ -18,7 +18,7 @@ class UserSeeder extends Seeder
                 'email' => 'superadmin@gmail.com',
                 'name' => 'super admin',
                 'role' => 'super_admin',
-                'password' => Hash::make('superadmin123'),
+                'password' => Hash::make('Tailwind CSS IntelliSense'),
                 'email_verified_at' => now(),
                 'phone_verified_at' => now(),
             ],
@@ -29,7 +29,7 @@ class UserSeeder extends Seeder
                 'password' => Hash::make('rafa1234'),
                 'email_verified_at' => now(),
                 'phone_verified_at' => now(),
-                'phone' => "6285724215989",
+                'phone' => '6285724215989',
 
             ],
             [
@@ -39,9 +39,9 @@ class UserSeeder extends Seeder
                 'password' => Hash::make('admin123'),
                 'email_verified_at' => now(),
                 'phone_verified_at' => now(),
-            ]
+            ],
         ];
-        foreach($users as $user){
+        foreach ($users as $user) {
             User::create($user);
         }
     }

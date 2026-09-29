@@ -20,19 +20,18 @@ class OrderController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request)
+    public function index()
     {
         $this->authorize('viewAny', ModelsOrder::class);
-        $perPage = min($request->input('per_page', 5), 7);
-        $Order = ModelsOrder::whereIn('status', [
+        $Order = ModelsOrder::whereIn('status', [   
             'Paid',
             'Diproses',
             'Dikirim',
             'Selesai',
-            'Canceled'
+            'Canceled',
         ])->with('order_item')
             ->latest()
-            ->paginate($perPage);
+            ->paginate(10);
         if ($Order->isEmpty()) {
             return response()->json(['messages' => "Order Not Found"], 404);
         }
@@ -112,7 +111,7 @@ class OrderController extends Controller
      * Display the specified resource.
      */
     public function show(Request $request, ModelsOrder $order)
-    {   
+    {
         $this->authorize('view', $order);
         return new OrderResource($order);
     }

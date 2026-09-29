@@ -2,7 +2,7 @@
 
 use App\Http\Controllers\Api\Admin\About;
 use App\Http\Controllers\Api\Admin\Banner as AdminBanner;
-use App\Http\Controllers\Api\Admin\CategoryController as AdminCategoryController;
+use App\Http\Controllers\Api\Admin\CategoryController ;
 use App\Http\Controllers\Api\Admin\DashboardController;
 use App\Http\Controllers\Api\Admin\Faq_category;
 use App\Http\Controllers\Api\Admin\ProductController;
@@ -79,12 +79,12 @@ Route::apiResource('faq-categories', Faq_category::class)
 // Visitor
 Route::post('/visitor', [VisitorController::class, 'store']);
 // CATEGORY
-Route::apiResource('category', AdminCategoryController::class)
-    ->only('index');
+Route::apiResource('category', CategoryController::class)
+    ->only('index','show');
 
 // SKIN TYPE
 Route::apiResource('skin-types', SkinTypes::class)
-    ->only(['index', 'show']);
+    ->only(['index']);
 // Banner
 Route::apiResource('banners', AdminBanner::class)
     ->only(['index', 'show']);
@@ -103,6 +103,12 @@ Route::apiResource('contacts', ContactController::class)
 Route::apiResource('result', AdminResult::class)
     ->only('index');
 //  Logout
+//  Shipping Zone
+Route::apiResource('shippingZone', ShippingZone::class)
+    ->only(['index']);
+// Zone Region
+Route::apiResource('zoneRegion', ZoneRegion::class)
+    ->only(['index']);
 Route::middleware('auth:sanctum')->group(function () {
     //  Logout  User
     Route::post('logout', [AuthDataUserController::class, 'logout']);
@@ -116,8 +122,11 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::apiResource('addresses', AddresController::class);
 
     // Order
-    Route::apiResource('orders', OrderController::class)
-        ->only(['checkout', 'show', 'user', 'destroy']);
+    Route::get('/orders/user', [OrderController::class, 'user']);
+    Route::post('/orders/checkout', [OrderController::class, 'checkout']);
+    Route::get('/orders/{order}', [OrderController::class, 'show']);
+    Route::delete('/orders/{order}', [OrderController::class, 'destroy']);
+
     Route::post('/orders/{order}/confirm-done', [OrderController::class, 'confirmDone']);
 
     //  User
@@ -149,8 +158,8 @@ Route::middleware(['auth:sanctum', 'role:admin|super_admin'])
     ->group(function () {
 
         // Category
-        Route::apiResource('category', AdminCategoryController::class)
-            ->only(['index', 'show', 'store', 'update', 'destroy']);
+        Route::apiResource('category', CategoryController::class)
+            ->only(['store', 'update', 'destroy']);
 
         // Order
         Route::apiResource('orders', OrderController::class)
@@ -176,7 +185,8 @@ Route::middleware(['auth:sanctum', 'role:admin|super_admin'])
             ->only(['index', 'store', 'update', 'destroy']);
 
         // Faq Category
-        Route::apiResource('faq-categories', Faq_category::class);
+        Route::apiResource('faq-categories', Faq_category::class)
+            ->only(['store', 'update', 'destroy']);
 
         // Detail Faq
         Route::apiResource('faq-details', DetailFaq::class)
@@ -194,9 +204,11 @@ Route::middleware(['auth:sanctum', 'role:admin|super_admin'])
         Route::apiResource('DataUser', AdminDataUser::class)
             ->only(['index']);
         //  Shipping Zone
-        Route::apiResource('shippingZone', ShippingZone::class);
+        Route::apiResource('shippingZone', ShippingZone::class)
+            ->only(['store', 'update', 'destroy']);
         // Zone Region
-        Route::apiResource('zoneRegion', ZoneRegion::class);
+        Route::apiResource('zoneRegion', ZoneRegion::class)
+            ->only(['store', 'update', 'destroy']);
         // visitor
         Route::get('/visitor', [DashboardController::class, 'indexVisit']);
         // cart top catgeory
@@ -209,7 +221,6 @@ Route::middleware(['auth:sanctum', 'role:admin|super_admin'])
         Route::get('/admin/dashboard/payments/count', [DashboardController::class, 'countPayment']);
         // Card Low Stcok
         Route::get('/admin/dashboard/low-stock', [DashboardController::class, 'lowStock']);
-
     });
 
 //  Hak Ases Super Admin
